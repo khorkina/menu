@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Menu Master</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Menu Master</div>
+    <div class="controls">
+      <button id="langBtn" class="btn">RU / DE</button>
+      <button id="resetWeekBtn" class="btn secondary">New Week</button>
+    </div>
+  </header>
+
+  <nav id="categories" class="categories"></nav>
+
+  <main class="layout">
+    <section>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <aside class="sidebar">
+      <h2 class="h2">Shopping list</h2>
+      <div id="shopping" class="shopping"></div>
+    </aside>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div id="modalTitle" class="h2"></div>
+        <button id="closeModal" class="btn secondary">Close</button>
+      </div>
+      <div id="planner" class="planner"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
