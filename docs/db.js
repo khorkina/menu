@@ -42,23 +42,23 @@ function reqToPromise(req) {
 }
 
 // --- KV ---
-export async function kvGet(key) {
+async function kvGet(key) {
   const db = await openDb();
   return reqToPromise(tx(db, "kv").get(key));
 }
 
-export async function kvSet(key, value) {
+async function kvSet(key, value) {
   const db = await openDb();
   return reqToPromise(tx(db, "kv", "readwrite").put({ key, value }));
 }
 
 // --- Dishes ---
-export async function dishesCount() {
+async function dishesCount() {
   const db = await openDb();
   return reqToPromise(tx(db, "dishes").count());
 }
 
-export async function dishesBulkAdd(list) {
+async function dishesBulkAdd(list) {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -74,19 +74,19 @@ export async function dishesBulkAdd(list) {
 }
 
 
-export async function listDishesByCategory(category) {
+async function listDishesByCategory(category) {
   const db = await openDb();
   const index = tx(db, "dishes").index("category");
   return reqToPromise(index.getAll(category));
 }
 
-export async function getDish(id) {
+async function getDish(id) {
   const db = await openDb();
   return reqToPromise(tx(db, "dishes").get(id));
 }
 
 // --- Weeks ---
-export async function getCurrentWeek() {
+async function getCurrentWeek() {
   const db = await openDb();
   const store = tx(db, "weeks");
   const all = await reqToPromise(store.getAll());
@@ -94,7 +94,7 @@ export async function getCurrentWeek() {
 }
 
 
-export async function createWeek(startDate) {
+async function createWeek(startDate) {
   const db = await openDb();
   const store = tx(db, "weeks", "readwrite");
   const id = await reqToPromise(store.add({
@@ -106,7 +106,7 @@ export async function createWeek(startDate) {
   return { id, startDate, isActive: true, isArchived: false };
 }
 
-export async function archiveCurrentWeek() {
+async function archiveCurrentWeek() {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -138,13 +138,13 @@ export async function archiveCurrentWeek() {
 
 
 // --- Plan ---
-export async function listPlan(weekId) {
+async function listPlan(weekId) {
   const db = await openDb();
   const index = tx(db, "planEntries").index("weekId");
   return reqToPromise(index.getAll(weekId));
 }
 
-export async function addPlanEntry({ weekId, date, slot, dishId }) {
+async function addPlanEntry({ weekId, date, slot, dishId }) {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -181,19 +181,19 @@ export async function addPlanEntry({ weekId, date, slot, dishId }) {
 
 
 
-export async function removePlanEntry(id) {
+async function removePlanEntry(id) {
   const db = await openDb();
   return reqToPromise(tx(db, "planEntries", "readwrite").delete(id));
 }
 
 // --- Shopping ---
-export async function listShopping(weekId) {
+async function listShopping(weekId) {
   const db = await openDb();
   const index = tx(db, "shoppingItems").index("weekId");
   return reqToPromise(index.getAll(weekId));
 }
 
-export async function upsertShoppingItem({ weekId, name, isChecked }) {
+async function upsertShoppingItem({ weekId, name, isChecked }) {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -226,7 +226,7 @@ export async function upsertShoppingItem({ weekId, name, isChecked }) {
 }
 
 
-export async function toggleShoppingItem(id, isChecked) {
+async function toggleShoppingItem(id, isChecked) {
   const db = await openDb();
   const store = tx(db, "shoppingItems", "readwrite");
   const item = await reqToPromise(store.get(id));
@@ -235,10 +235,24 @@ export async function toggleShoppingItem(id, isChecked) {
   return item;
 }
 
-export async function clearShoppingForWeek(weekId) {
+async function clearShoppingForWeek(weekId) {
   const db = await openDb();
-  const store = tx(db, "shoppingItems", "readwrite");
   const items = await listShopping(weekId);
-  for (const it of items) store.delete(it.id);
-  return true;
+  
+  return new Promise((resolve, reject) => {
+    const tr = db.transaction("shoppingItems", "readwrite");
+    const store = tr.objectStore("shoppingItems");
+    for (const it of items) store.delete(it.id);
+    tr.oncomplete = () => resolve(true);
+    tr.onerror = () => reject(tr.error);
+  });
 }
+
+// Global scope for use in app.js
+window.MM_DB = {
+  kvGet, kvSet,
+  dishesCount, dishesBulkAdd, listDishesByCategory, getDish,
+  getCurrentWeek, createWeek, archiveCurrentWeek,
+  listPlan, addPlanEntry, removePlanEntry,
+  listShopping, upsertShoppingItem, toggleShoppingItem, clearShoppingForWeek
+};

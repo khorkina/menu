@@ -1,4 +1,5 @@
-export const SEED_DISHES = [
+// docs/seed.js
+const SEED_DISHES = [
   // Salads
   { category: "salads", titleRu: "Салат огуречный", titleDe: "Gurkensalat", ingredientsRu: ["огурцы", "чеснок", "сметана", "укроп"], ingredientsDe: ["Gurken", "Knoblauch", "Sauerrahm", "Dill"], kcal: 120, weight: 200, imageUrl: "./images/salad_cucumber.png" },
   { category: "salads", titleRu: "Туна салат", titleDe: "Thunfischsalat", ingredientsRu: ["тунец", "салат", "помидоры", "чеснок", "горчица", "творожный сыр", "яйца"], ingredientsDe: ["Thunfisch", "Salat", "Tomaten", "Knoblauch", "Senf", "Frischkäse", "Eier"], kcal: 340, weight: 250, imageUrl: "./images/salad_tuna.png" },
@@ -45,3 +46,5 @@ export const SEED_DISHES = [
   { category: "desserts", titleRu: "Ватрушки с вишней", titleDe: "Kirschtaschen", ingredientsRu: ["тесто", "вишня", "сахар"], ingredientsDe: ["Teig", "Kirschen", "Zucker"], kcal: 430, weight: 140, imageUrl: "./images/dessert_cherry_buns.png" },
   { category: "desserts", titleRu: "Банановый кекс", titleDe: "Bananenkuchen", ingredientsRu: ["бананы", "какао", "мука"], ingredientsDe: ["Bananen", "Kakao", "Mehl"], kcal: 380, weight: 120, imageUrl: "./images/dessert_banana_cake.png" },
 ];
+
+window.SEED_DISHES = SEED_DISHES;
